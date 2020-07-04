@@ -2,13 +2,12 @@ package ru.otus.service.quiz.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
-import ru.otus.service.io.IOService;
 import ru.otus.dao.QuizDao;
 import ru.otus.dao.entity.Quiz;
+import ru.otus.service.io.IOService;
 import ru.otus.service.quiz.QuizService;
 import ru.otus.service.quiz.dto.Interviewer;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Locale;
 
@@ -22,11 +21,6 @@ public class QuizServiceImpl implements QuizService {
     private final IOService ioService;
 
     private final MessageSource messageSource;
-
-    @PostConstruct
-    public void go() {
-        interview();
-    }
 
     @Override
     public Interviewer interview() {

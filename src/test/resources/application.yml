@@ -1,0 +1,12 @@
+quiz:
+  source: /quiz.csv
+  id-index: 0
+  question-index: 1
+  answerIndex: 2
+  delimiter: ;
+
+required-points: 2
+
+spring:
+  messages:
+    basename: messages

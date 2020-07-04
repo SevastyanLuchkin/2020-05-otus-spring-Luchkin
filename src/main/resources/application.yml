@@ -1,0 +1,15 @@
+spring:
+  messages:
+    basename: /i18n/bundle
+    encoding: UTF-8
+
+quiz:
+  source: src/main/resources/quiz.csv
+  id-index: 0
+  question-index: 1
+  answerIndex: 2
+  delimiter: ;
+
+required-points: 2
+
+

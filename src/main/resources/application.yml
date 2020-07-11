@@ -1,15 +1,6 @@
 spring:
-  messages:
-    basename: /i18n/bundle
-    encoding: UTF-8
+  datasource:
+    url:  jdbc:h2:mem:testdb
 
-quiz:
-  source: src/main/resources/quiz.csv
-  id-index: 0
-  question-index: 1
-  answerIndex: 2
-  delimiter: ;
-
-required-points: 2
-
-
+  liquibase:
+    change-log: classpath:/db/changelog/changelog.xml

@@ -26,7 +26,7 @@
             <column name="NAME" type="TEXT">
                 <constraints nullable="false"/>
             </column>
-            <column name="TAKEN" type="BOOLEAN">
+            <column name="TAKEN" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
         </createTable>

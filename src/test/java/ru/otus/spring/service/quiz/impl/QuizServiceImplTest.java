@@ -1,63 +1,83 @@
 package ru.otus.spring.service.quiz.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import ru.otus.config.QuizProperties;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.shell.jline.InteractiveShellApplicationRunner;
+import org.springframework.shell.jline.ScriptShellApplicationRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.otus.dao.QuizDao;
-import ru.otus.dao.impl.QuizDaoCsv;
+import ru.otus.dao.entity.Quiz;
 import ru.otus.service.io.IOService;
-import ru.otus.service.io.impl.IOServiceImpl;
 import ru.otus.service.quiz.QuizService;
 import ru.otus.service.quiz.dto.Interviewer;
-import ru.otus.service.quiz.impl.QuizServiceImpl;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.otus.spring.service.quiz.impl.TestData.TEST_FAILED;
-import static ru.otus.spring.service.quiz.impl.TestData.TEST_PASSED;
 
+@SpringBootTest(properties = {
+        InteractiveShellApplicationRunner.SPRING_SHELL_INTERACTIVE_ENABLED + "=false",
+        ScriptShellApplicationRunner.SPRING_SHELL_SCRIPT_ENABLED + "=false"
+})
+@ExtendWith(SpringExtension.class)
 class QuizServiceImplTest {
 
-    private QuizProperties quizProperties = new QuizProperties("src/test/resources/quiz.csv", 0, 1, 2, ";");
-    ReloadableResourceBundleMessageSource messageSource = getMessageSource();
+    @MockBean
+    private QuizDao quizDao;
 
-    private QuizDao quizDao = new QuizDaoCsv(quizProperties);
+    @MockBean
+    private IOService ioService;
+
+    @Autowired
+    private QuizService quizService;
+
+    @BeforeEach
+    void beforeEach() {
+        Mockito.when(quizDao.findAll())
+                .thenReturn(Arrays.asList(Quiz.builder()
+                                .id(1)
+                                .question("What’s your favorite color?")
+                                .answer("darcula")
+                                .build(),
+                        Quiz.builder()
+                                .id(2)
+                                .question("What makes you happiest?")
+                                .answer("java")
+                                .build()));
+    }
 
     @Test
     void interviewPassedTest() {
+        Mockito.when(ioService.in())
+                .thenReturn("James Gosling")
+                .thenReturn("darcula")
+                .thenReturn("java");
+
         Interviewer expected = Interviewer.builder()
                 .name("James Gosling")
                 .success(true)
                 .build();
-        IOService ioService = new IOServiceImpl(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(TEST_PASSED.getBytes()))), System.out);
-        QuizService quizService = new QuizServiceImpl(2, quizDao, ioService, messageSource);
-        Interviewer actual = quizService.interview();
 
-        assertThat(actual).as("name").isEqualTo(expected)
-                .as("success").isEqualTo(expected);
+        Interviewer actual = quizService.interview();
+        assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @Test
     void interviewFailedTest() {
+        Mockito.when(ioService.in())
+                .thenReturn("Egor Bugaenko")
+                .thenReturn("decorator")
+                .thenReturn("decorator");
         Interviewer expected = Interviewer.builder()
                 .name("Egor Bugaenko")
                 .success(false)
                 .build();
-        IOService ioService = new IOServiceImpl(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(TEST_FAILED.getBytes()))), System.out);
-        QuizService quizService = new QuizServiceImpl(2, quizDao, ioService, messageSource);
         Interviewer actual = quizService.interview();
-
-        assertThat(actual).as("name").isEqualTo(expected)
-                .as("success").isEqualTo(expected);
-    }
-
-    private ReloadableResourceBundleMessageSource getMessageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:/i18n/bundle");
-        messageSource.setDefaultEncoding("UTF-8");
-        return messageSource;
+        assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 }

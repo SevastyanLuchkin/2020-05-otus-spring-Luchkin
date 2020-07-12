@@ -1,7 +1,9 @@
 package ru.otus.service.quiz.impl;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.shell.standard.ShellComponent;
+import org.springframework.shell.standard.ShellMethod;
 import ru.otus.dao.QuizDao;
 import ru.otus.dao.entity.Quiz;
 import ru.otus.service.io.IOService;
@@ -10,8 +12,9 @@ import ru.otus.service.quiz.dto.Interviewer;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
-@RequiredArgsConstructor
+@ShellComponent
 public class QuizServiceImpl implements QuizService {
 
     private final int requiredPoints;
@@ -22,9 +25,16 @@ public class QuizServiceImpl implements QuizService {
 
     private final MessageSource messageSource;
 
-    @Override
-    public Interviewer interview() {
+    public QuizServiceImpl(@Value("${required-points}") int requiredPoints, QuizDao quizDao, IOService ioService, MessageSource messageSource) {
+        this.requiredPoints = requiredPoints;
+        this.quizDao = quizDao;
+        this.ioService = ioService;
+        this.messageSource = messageSource;
+    }
 
+    @Override
+    @ShellMethod(key = {"interview", "i"}, value = "pass interview")
+    public Interviewer interview() {
         ioService.out(messageSource.getMessage("greeting", new String[]{}, new Locale("ru_RU")));
         String interviewerName = ioService.in();
         List<Quiz> quizList = quizDao.findAll();
@@ -40,6 +50,6 @@ public class QuizServiceImpl implements QuizService {
 
     private boolean isAnswerRight(Quiz quiz) {
         ioService.out(quiz.getQuestion());
-        return ioService.in().equals(quiz.getAnswer());
+        return Objects.equals(ioService.in(), quiz.getAnswer());
     }
 }

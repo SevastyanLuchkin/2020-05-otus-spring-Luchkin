@@ -4,6 +4,5 @@ import ru.otus.service.quiz.dto.Interviewer;
 
 public interface QuizService {
 
-
     Interviewer interview();
 }

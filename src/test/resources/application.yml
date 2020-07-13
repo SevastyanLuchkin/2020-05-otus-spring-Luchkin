@@ -1,12 +1,6 @@
-quiz:
-  source: /quiz.csv
-  id-index: 0
-  question-index: 1
-  answerIndex: 2
-  delimiter: ;
-
-required-points: 2
-
 spring:
-  messages:
-    basename: messages
+  datasource:
+    url:  jdbc:h2:mem:testdb
+
+  liquibase:
+    change-log: classpath:/db/changelog/changelog.xml

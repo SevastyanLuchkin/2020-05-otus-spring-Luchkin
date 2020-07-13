@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="05072020-1" author="Luchkin">
+        <preConditions>
+            <not>
+                <sequenceExists sequenceName="S_BOOK"/>
+            </not>
+        </preConditions>
+        <createSequence sequenceName="S_BOOK" startValue="1" incrementBy="1"/>
+    </changeSet>
+    <changeSet id="05072020-2" author="Luchkin">
+        <preConditions>
+            <not>
+                <tableExists tableName="BOOKS"/>
+            </not>
+        </preConditions>
+        <createTable tableName="BOOKS">
+            <column name="BOOK_ID" type="BIGINT" defaultValueComputed="NEXTVAL('S_BOOK')">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="NAME" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TAKEN" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="05072020-3" author="Luchkin">
+        <preConditions>
+            <not>
+                <sequenceExists sequenceName="S_AUTHOR"/>
+            </not>
+        </preConditions>
+        <createSequence sequenceName="S_AUTHOR" startValue="1" incrementBy="1"/>
+    </changeSet>
+    <changeSet id="05072020-4" author="Luchkin">
+        <preConditions>
+            <not>
+                <tableExists tableName="AUTHORS"/>
+            </not>
+        </preConditions>
+        <createTable tableName="AUTHORS">
+            <column name="AUTHOR_ID" type="BIGINT" defaultValueComputed="NEXTVAL('S_AUTHOR')">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="NAME" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="BOOK_ID" type="BIGINT">
+                <constraints foreignKeyName="FK_AUTHOR_BOOK" references="BOOKS(BOOK_ID)" deleteCascade="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="05072020-5" author="Luchkin">
+        <preConditions>
+            <not>
+                <sequenceExists sequenceName="S_GENRE"/>
+            </not>
+        </preConditions>
+        <createSequence sequenceName="S_GENRE" startValue="1" incrementBy="1"/>
+    </changeSet>
+    <changeSet id="05072020-6" author="Luchkin">
+        <preConditions>
+            <not>
+                <tableExists tableName="GENRES"/>
+            </not>
+        </preConditions>
+        <createTable tableName="GENRES">
+            <column name="GENRE_ID" type="BIGINT" defaultValueComputed="NEXTVAL('S_GENRE')">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="NAME" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="BOOK_ID" type="BIGINT">
+                <constraints foreignKeyName="FK_GENRE_BOOK" references="BOOKS(BOOK_ID)" deleteCascade="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="05072020-7" author="Luchkin">
+        <preConditions onFail="WARN">
+            <sqlCheck expectedResult="0">select count(*) from BOOKS</sqlCheck>
+        </preConditions>
+        <insert tableName="BOOKS">
+            <column name="NAME" value="War and peace"/>
+            <column name="TAKEN" value="false"/>
+        </insert>
+        <insert tableName="AUTHORS">
+            <column name="NAME" value="Leo Tolstoy"/>
+            <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='War and peace'"/>
+        </insert>
+        <insert tableName="GENRES">
+            <column name="NAME" value="Historical novel"/>
+            <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='War and peace'"/>
+        </insert>
+        <insert tableName="BOOKS">
+            <column name="NAME" value="Crime and punishment"/>
+            <column name="TAKEN" value="false"/>
+        </insert>
+        <insert tableName="AUTHORS">
+            <column name="NAME" value="Fyodor Dostoevsky"/>
+            <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='Crime and punishment'"/>
+        </insert>
+        <insert tableName="GENRES">
+            <column name="NAME" value="Crime fiction"/>
+            <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='Crime and punishment'"/>
+        </insert>
+    </changeSet>
+
+
+</databaseChangeLog>

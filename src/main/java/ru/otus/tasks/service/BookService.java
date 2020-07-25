@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface BookService {
 
-    void donateBook(String name, String author, String genre);
+    long donateBook(String name, String author, String genre);
 
     void returnBook(long id);
 

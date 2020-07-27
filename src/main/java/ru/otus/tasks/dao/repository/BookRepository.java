@@ -3,6 +3,7 @@ package ru.otus.tasks.dao.repository;
 import ru.otus.tasks.dao.entity.Book;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BookRepository {
 
@@ -12,7 +13,7 @@ public interface BookRepository {
 
     List<Book> findByName(String name);
 
-    List<Book> findByAuthor(String author);
+    Map<Long, Book> findByAuthor(String author);
 
     List<Book> findByGenre(String genre);
 

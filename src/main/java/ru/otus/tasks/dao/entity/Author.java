@@ -29,4 +29,7 @@ public class Author {
 
     @Column(name = "NAME")
     private String name;
+
+    @Column(name = "BOOK_ID")
+    private long bookId;
 }

@@ -9,10 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.otus.tasks.dao.entity.Author;
 import ru.otus.tasks.dao.entity.Book;
 import ru.otus.tasks.dao.entity.Genre;
+import ru.otus.tasks.dao.repository.AuthorRepository;
 import ru.otus.tasks.dao.repository.BookRepository;
 import ru.otus.tasks.service.BookService;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,6 +26,8 @@ import java.util.stream.Stream;
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
+
+    private final AuthorRepository authorRepository;
 
     @Override
     @Transactional
@@ -59,7 +64,10 @@ public class BookServiceImpl implements BookService {
     @Override
     @ShellMethod(key = {"showByAuthor", "sa"}, value = "show by author")
     public List<Book> showBooksByAuthor(@ShellOption String author) {
-        return bookRepository.findByAuthor(author);
+        Map<Long, Book> books = bookRepository.findByAuthor(author);
+        Map<Long, List<Author>> authors = authorRepository.findByName(author);
+        books.forEach((bookId, book) -> book.setAuthor(authors.get(bookId)));
+        return new ArrayList<>(books.values());
     }
 
     @Override

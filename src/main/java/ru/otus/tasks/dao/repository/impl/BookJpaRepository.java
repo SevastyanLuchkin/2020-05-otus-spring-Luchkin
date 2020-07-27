@@ -8,6 +8,9 @@ import ru.otus.tasks.dao.repository.BookRepository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -41,10 +44,12 @@ public class BookJpaRepository implements BookRepository {
     }
 
     @Override
-    public List<Book> findByAuthor(String author) {
-        return em.createQuery("select b from Book b join fetch b.author a where a.name =: author", Book.class)
+    public Map<Long, Book> findByAuthor(String author) {
+        return em.createQuery("select b from Book b join b.author a where a.name =: author", Book.class)
                 .setParameter("author", author)
-                .getResultList();
+                .getResultList()
+                .stream()
+                .collect(Collectors.toMap(Book::getId, Function.identity()));
     }
 
     @Override

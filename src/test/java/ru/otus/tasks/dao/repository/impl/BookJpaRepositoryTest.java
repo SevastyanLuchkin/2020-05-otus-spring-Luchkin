@@ -10,6 +10,7 @@ import ru.otus.tasks.dao.entity.Book;
 import ru.otus.tasks.dao.entity.Genre;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -50,8 +51,8 @@ class BookJpaRepositoryTest {
 
     @Test
     void findByAuthor() {
-        List<Book> actual = bookJpaRepository.findByAuthor("author");
-        assertBooks(actual.get(0), EXPECTED);
+        Map<Long, Book> actualMap = bookJpaRepository.findByAuthor("author");
+        assertBooks(actualMap.get(3L), EXPECTED);
     }
 
     @Test

@@ -22,7 +22,6 @@ import java.util.stream.Stream;
 @Service
 @ShellComponent
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;

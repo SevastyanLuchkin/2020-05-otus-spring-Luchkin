@@ -1,5 +1,6 @@
 package ru.otus.tasks.service;
 
+import ru.otus.tasks.dao.entity.Author;
 import ru.otus.tasks.dao.entity.Book;
 
 import java.util.List;
@@ -14,9 +15,7 @@ public interface BookService {
 
     List<Book> showBooksByName(String name);
 
-    List<Book> showBooksByAuthor(String author);
-
-    List<Book> showBooksByGenre(String author);
+    List<Author> showAuthors(String author);
 
     List<Book> showAll();
 }

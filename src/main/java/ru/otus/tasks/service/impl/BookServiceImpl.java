@@ -13,9 +13,7 @@ import ru.otus.tasks.dao.repository.AuthorRepository;
 import ru.otus.tasks.dao.repository.BookRepository;
 import ru.otus.tasks.service.BookService;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,18 +59,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @ShellMethod(key = {"showByAuthor", "sa"}, value = "show by author")
-    public List<Book> showBooksByAuthor(@ShellOption String author) {
-        Map<Long, Book> books = bookRepository.findByAuthor(author);
-        Map<Long, List<Author>> authors = authorRepository.findByName(author);
-        books.forEach((bookId, book) -> book.setAuthor(authors.get(bookId)));
-        return new ArrayList<>(books.values());
-    }
-
-    @Override
-    @ShellMethod(key = {"showByGenre", "sg"}, value = "show by genre")
-    public List<Book> showBooksByGenre(@ShellOption String genre) {
-        return bookRepository.findByGenre(genre);
+    @ShellMethod(key = {"showAuthors", "sa"}, value = "show authors")
+    public List<Author> showAuthors(@ShellOption String author) {
+        return authorRepository.findByName(author);
     }
 
     @Override

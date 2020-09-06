@@ -39,16 +39,6 @@ public class BookJpaRepository implements BookRepository {
                 .setParameter("authorName", authorName)
                 .setParameter("genreName", genreName)
                 .getSingleResult();
-//        List<Author> authors = em.createQuery("select a from Author a " +
-//                "where a.name = :authorName", Author.class)
-//                .setParameter("authorName", authorName)
-//                .getResultList();
-//        return em.createQuery("select g from Genre g join g.book b " +
-//                "where b.authors in (:authors) and b.name =:bookName", Genre.class)
-//                .setParameter("authors", authors)
-//                .setParameter("bookName", bookName)
-//                .getSingleResult()
-//                .getBook();
     }
 
     @Override

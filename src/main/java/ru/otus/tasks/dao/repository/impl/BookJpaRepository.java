@@ -2,15 +2,13 @@ package ru.otus.tasks.dao.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.tasks.dao.entity.Book;
 import ru.otus.tasks.dao.repository.BookRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -20,6 +18,7 @@ public class BookJpaRepository implements BookRepository {
     private final EntityManager em;
 
     @Override
+    @Transactional
     public long create(Book book) {
         em.persist(book);
         return book.getId();
@@ -32,31 +31,24 @@ public class BookJpaRepository implements BookRepository {
 
     @Override
     public Book findByNameAndAuthorAndGenre(String bookName, String authorName, String genreName) {
-        List<Book> books = em.createQuery("select b from Book b join fetch b.author a " +
-                "where b.name = :bookName and a.name = :authorName", Book.class)
+        return em.createQuery("select b from Book b " +
+                "join fetch b.genres g " +
+                "join b.authors a " +
+                "where b.name = :bookName and a.name = :authorName and g.name = :genreName", Book.class)
                 .setParameter("bookName", bookName)
                 .setParameter("authorName", authorName)
-                .getResultList();
-        return em.createQuery("select b from Book b join fetch b.genre g where b in (:books) and g.name = :genreName", Book.class)
-                .setParameter("books", books)
                 .setParameter("genreName", genreName)
                 .getSingleResult();
-    }
-
-    @Override
-    public Map<Long, Book> findByAuthor(String author) {
-        return em.createQuery("select b from Book b join b.author a where a.name =: author", Book.class)
-                .setParameter("author", author)
-                .getResultList()
-                .stream()
-                .collect(Collectors.toMap(Book::getId, Function.identity()));
-    }
-
-    @Override
-    public List<Book> findByGenre(String genre) {
-        return em.createQuery("select b from Book b join fetch b.genre g where g.name = : genre", Book.class)
-                .setParameter("genre", genre)
-                .getResultList();
+//        List<Author> authors = em.createQuery("select a from Author a " +
+//                "where a.name = :authorName", Author.class)
+//                .setParameter("authorName", authorName)
+//                .getResultList();
+//        return em.createQuery("select g from Genre g join g.book b " +
+//                "where b.authors in (:authors) and b.name =:bookName", Genre.class)
+//                .setParameter("authors", authors)
+//                .setParameter("bookName", bookName)
+//                .getSingleResult()
+//                .getBook();
     }
 
     @Override
@@ -68,10 +60,7 @@ public class BookJpaRepository implements BookRepository {
 
     @Override
     public List<Book> findAll() {
-        List<Book> books = em.createQuery("select b from Book b join fetch b.author", Book.class)
-                .getResultList();
-        return em.createQuery("select b from Book b join fetch b.genre where b in :books", Book.class)
-                .setParameter("books", books)
+        return em.createQuery("select b from Book b", Book.class)
                 .getResultList();
     }
 

@@ -11,9 +11,11 @@ import ru.otus.tasks.dao.entity.Book;
 import ru.otus.tasks.dao.entity.Genre;
 import ru.otus.tasks.dao.repository.AuthorRepository;
 import ru.otus.tasks.dao.repository.BookRepository;
+import ru.otus.tasks.dao.repository.GenreRepository;
 import ru.otus.tasks.service.BookService;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,14 +28,7 @@ public class BookServiceImpl implements BookService {
 
     private final AuthorRepository authorRepository;
 
-    @Override
-    @Transactional
-    @ShellMethod(key = {"return", "r"}, value = "return book")
-    public void returnBook(long id) {
-        Book book = bookRepository.findById(id);
-        book.setTaken(false);
-        bookRepository.update(book);
-    }
+    private final GenreRepository genreRepository;
 
     @Override
     @ShellMethod(key = {"donate", "d"}, value = "donate book")
@@ -53,15 +48,42 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
+    @ShellMethod(key = {"return", "r"}, value = "return book")
+    public void returnBook(long id) {
+        Book book = bookRepository.findById(id);
+        book.setTaken(false);
+        bookRepository.update(book);
+    }
+
+    @Override
     @ShellMethod(key = {"showByName", "sn"}, value = "show by name")
     public List<Book> showBooksByName(@ShellOption String name) {
         return bookRepository.findByName(name);
     }
 
     @Override
-    @ShellMethod(key = {"showAuthors", "sa"}, value = "show authors")
-    public List<Author> showAuthors(@ShellOption String author) {
-        return authorRepository.findByName(author);
+    @ShellMethod(key = {"showAuthors", "a"}, value = "show authors")
+    public List<Author> showAuthors() {
+        return authorRepository.findAll();
+    }
+
+    @Override
+    @ShellMethod(key = {"showByAuthor", "sa"}, value = "show by author")
+    public Book showByAuthors(@ShellOption String author) {
+        return authorRepository.findByName(author).getBook();
+    }
+
+    @Override
+    @ShellMethod(key = {"showGenres", "g"}, value = "show genres")
+    public List<Author> showGenres() {
+        return genreRepository.findAll();
+    }
+
+    @Override
+    @ShellMethod(key = {"showByGenre", "sg"}, value = "show by genre")
+    public Book showByGenres(@ShellOption String author) {
+        return genreRepository.findByName(author).getBook();
     }
 
     @Override
@@ -76,27 +98,27 @@ public class BookServiceImpl implements BookService {
         }
     }
 
-    private Book createBook(String bookName, List<Author> author, List<Genre> genre) {
+    private Book createBook(String bookName, Set<Author> author, Set<Genre> genre) {
         return Book.builder()
                 .name(bookName)
-                .author(author)
-                .genre(genre)
+                .authors(author)
+                .genres(genre)
                 .build();
     }
 
-    private List<Genre> createGenres(String... genres) {
+    private Set<Genre> createGenres(String... genres) {
         return Stream.of(genres)
                 .map(genre -> Genre.builder()
                         .name(genre)
                         .build())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
-    private List<Author> createAuthors(String... authors) {
+    private Set<Author> createAuthors(String... authors) {
         return Stream.of(authors)
                 .map(author -> Author.builder()
                         .name(author)
                         .build())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 }

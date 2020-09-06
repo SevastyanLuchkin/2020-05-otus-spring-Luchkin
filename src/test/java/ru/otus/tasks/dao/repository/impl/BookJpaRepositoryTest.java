@@ -10,14 +10,14 @@ import ru.otus.tasks.dao.entity.Book;
 import ru.otus.tasks.dao.entity.Genre;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static ru.otus.tasks.dao.repository.impl.TestData.EXPECTED;
-import static ru.otus.tasks.dao.repository.impl.TestData.EXPECTED_LIST;
+import static ru.otus.tasks.dao.repository.impl.TestData.EXPECTED_BOOK;
+import static ru.otus.tasks.dao.repository.impl.TestData.EXPECTED_BOOKS;
 
 @DataJpaTest
 @Import(BookJpaRepository.class)
@@ -40,39 +40,27 @@ class BookJpaRepositoryTest {
     @Test
     void findById() {
         Book actual = bookJpaRepository.findById(3L);
-        assertBooks(EXPECTED, actual);
+        assertBooks(EXPECTED_BOOK, actual);
     }
 
     @Test
     void findByNameAndAuthorAndGenre() {
         Book actual = bookJpaRepository.findByNameAndAuthorAndGenre("book", "author", "genre");
-        assertBooks(EXPECTED, actual);
-    }
-
-    @Test
-    void findByAuthor() {
-        Map<Long, Book> actualMap = bookJpaRepository.findByAuthor("author");
-        assertBooks(actualMap.get(3L), EXPECTED);
-    }
-
-    @Test
-    void findByGenre() {
-        List<Book> actual = bookJpaRepository.findByGenre("genre");
-        assertBooks(actual.get(0), EXPECTED);
+        assertBooks(EXPECTED_BOOK, actual);
     }
 
     @Test
     void findByName() {
         List<Book> actual = bookJpaRepository.findByName("book");
-        assertBooks(actual.get(0), EXPECTED);
+        assertBooks(actual.get(0), EXPECTED_BOOK);
     }
 
     @Test
     void findAll() {
         List<Book> actual = bookJpaRepository.findAll();
-        assertEquals(actual.size(), EXPECTED_LIST.size());
+        assertEquals(actual.size(), EXPECTED_BOOKS.size());
         for (int i = 0; i < actual.size(); i++) {
-            assertBooks(actual.get(i), EXPECTED_LIST.get(i));
+            assertBooks(actual.get(i), EXPECTED_BOOKS.get(i));
         }
     }
 
@@ -80,13 +68,13 @@ class BookJpaRepositoryTest {
     void update() {
         Book origin = bookJpaRepository.findById(3);
         origin.setName("new");
-        origin.getGenre().get(0).setName("new");
-        origin.getAuthor().get(0).setName("new");
+        origin.getGenres().stream().findAny().get().setName("new");
+        origin.getAuthors().stream().findAny().get().setName("new");
         bookJpaRepository.update(origin);
         Book actual = bookJpaRepository.findById(3);
         assertEquals(actual.getName(), "new");
-        assertEquals(actual.getGenre().get(0).getName(), "new");
-        assertEquals(actual.getAuthor().get(0).getName(), "new");
+        assertEquals(actual.getGenres().stream().findAny().get().getName(), "new");
+        assertEquals(actual.getAuthors().stream().findAny().get().getName(), "new");
     }
 
     @Test
@@ -98,42 +86,42 @@ class BookJpaRepositoryTest {
     private void assertBooks(Book expected, Book actual) {
         assertEquals(expected.getName(), actual.getName());
 
-        assertEquals(expected.getAuthor().size(), actual.getAuthor().size());
-        List<Author> expectedAuthors = expected.getAuthor();
-        List<Author> actualAuthors = actual.getAuthor();
+        assertEquals(expected.getAuthors().size(), actual.getAuthors().size());
+        Set<Author> expectedAuthors = expected.getAuthors();
+        Set<Author> actualAuthors = actual.getAuthors();
         for (int i = 0; i < expectedAuthors.size(); i++) {
-            assertEquals(expectedAuthors.get(i).getName(), actualAuthors.get(i).getName());
+            assertEquals(expectedAuthors.stream().findAny().get().getName(), actualAuthors.stream().findAny().get().getName());
         }
 
-        assertEquals(expected.getGenre().size(), actual.getGenre().size());
-        List<Genre> expectedGenre = expected.getGenre();
-        List<Genre> actualGenre = actual.getGenre();
+        assertEquals(expected.getGenres().size(), actual.getGenres().size());
+        Set<Genre> expectedGenre = expected.getGenres();
+        Set<Genre> actualGenre = actual.getGenres();
         for (int i = 0; i < expectedGenre.size(); i++) {
-            assertEquals(expectedGenre.get(i).getName(), actualGenre.get(i).getName());
+            assertEquals(expectedGenre.stream().findAny().get().getName(), actualGenre.stream().findAny().get().getName());
         }
     }
 
-    public static Book createBook(String bookName, List<Author> author, List<Genre> genre) {
+    public static Book createBook(String bookName, Set<Author> author, Set<Genre> genre) {
         return Book.builder()
                 .name(bookName)
-                .author(author)
-                .genre(genre)
+                .authors(author)
+                .genres(genre)
                 .build();
     }
 
-    public static List<Genre> createGenres(String... genres) {
+    public static Set<Genre> createGenres(String... genres) {
         return Stream.of(genres)
                 .map(genre -> Genre.builder()
                         .name(genre)
                         .build())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
-    public static List<Author> createAuthors(String... authors) {
+    public static Set<Author> createAuthors(String... authors) {
         return Stream.of(authors)
                 .map(author -> Author.builder()
                         .name(author)
                         .build())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 }

@@ -1,5 +1,6 @@
 package ru.otus.tasks.service;
 
+import org.springframework.shell.standard.ShellMethod;
 import ru.otus.tasks.dao.entity.Author;
 import ru.otus.tasks.dao.entity.Book;
 
@@ -15,7 +16,15 @@ public interface BookService {
 
     List<Book> showBooksByName(String name);
 
-    List<Author> showAuthors(String author);
+    @ShellMethod(key = {"showByAuthor", "sa"}, value = "show by author")
+    List<Author> showAuthors();
+
+    Book showByAuthors(String author);
+
+    @ShellMethod(key = {"showGenres", "g"}, value = "show genres")
+    List<Author> showGenres();
+
+    Book showByGenres(String author);
 
     List<Book> showAll();
 }

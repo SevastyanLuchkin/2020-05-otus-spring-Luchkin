@@ -1,22 +1,18 @@
 package ru.otus.tasks.dao.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.*;
 
-import javax.persistence.Column;
+import javax.persistence.*;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.util.List;
+import java.util.Set;
 
-@Data
+@ToString
+@Getter
+@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -33,13 +29,13 @@ public class Book {
     @Column(name = "NAME")
     private String name;
 
-    @OneToMany
-    @JoinColumn(name = "BOOK_ID")
-    private List<Author> author;
+    @OneToMany(mappedBy = "book", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(FetchMode.SUBSELECT)
+    private Set<Author> authors;
 
-    @OneToMany
-    @JoinColumn(name = "BOOK_ID")
-    private List<Genre> genre;
+    @OneToMany(mappedBy = "book", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(FetchMode.SUBSELECT)
+    private Set<Genre> genres;
 
     @Column(name = "TAKEN")
     private boolean taken;

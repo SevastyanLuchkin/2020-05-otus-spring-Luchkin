@@ -12,10 +12,6 @@ public interface BookRepository {
 
     List<Book> findByName(String name);
 
-    List<Book> findByAuthor(String author);
-
-    List<Book> findByGenre(String genre);
-
     Book findByNameAndAuthorAndGenre(String book, String author, String genre);
 
     List<Book> findAll();

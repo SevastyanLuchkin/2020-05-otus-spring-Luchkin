@@ -6,7 +6,7 @@
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <changeSet id="05072020-1" author="Luchkin">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <sequenceExists sequenceName="S_BOOK"/>
             </not>
@@ -14,7 +14,7 @@
         <createSequence sequenceName="S_BOOK" startValue="1" incrementBy="1"/>
     </changeSet>
     <changeSet id="05072020-2" author="Luchkin">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="BOOKS"/>
             </not>
@@ -34,7 +34,7 @@
 
 
     <changeSet id="05072020-3" author="Luchkin">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <sequenceExists sequenceName="S_AUTHOR"/>
             </not>
@@ -42,7 +42,7 @@
         <createSequence sequenceName="S_AUTHOR" startValue="1" incrementBy="1"/>
     </changeSet>
     <changeSet id="05072020-4" author="Luchkin">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="AUTHORS"/>
             </not>
@@ -62,7 +62,7 @@
 
 
     <changeSet id="05072020-5" author="Luchkin">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <sequenceExists sequenceName="S_GENRE"/>
             </not>
@@ -70,7 +70,7 @@
         <createSequence sequenceName="S_GENRE" startValue="1" incrementBy="1"/>
     </changeSet>
     <changeSet id="05072020-6" author="Luchkin">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="GENRES"/>
             </not>
@@ -116,6 +116,18 @@
         <insert tableName="GENRES">
             <column name="NAME" value="Crime fiction"/>
             <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='Crime and punishment'"/>
+        </insert>
+        <insert tableName="BOOKS">
+            <column name="NAME" value="book"/>
+            <column name="TAKEN" value="false"/>
+        </insert>
+        <insert tableName="AUTHORS">
+            <column name="NAME" value="author"/>
+            <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='book'"/>
+        </insert>
+        <insert tableName="GENRES">
+            <column name="NAME" value="genre"/>
+            <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='book'"/>
         </insert>
     </changeSet>
 

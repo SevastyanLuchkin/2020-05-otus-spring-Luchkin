@@ -5,6 +5,7 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.tasks.dao.entity.Author;
 import ru.otus.tasks.dao.entity.Book;
 import ru.otus.tasks.dao.entity.Genre;
@@ -14,6 +15,9 @@ import ru.otus.tasks.dao.repository.GenreRepository;
 import ru.otus.tasks.service.BookService;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @ShellComponent
@@ -27,28 +31,28 @@ public class BookServiceImpl implements BookService {
     private final GenreRepository genreRepository;
 
     @Override
-    @ShellMethod(key = {"return", "r"}, value = "return book")
-    public void returnBook(long id) {
-        Book book = bookRepository.findById(id);
-        book.setTaken(false);
-        bookRepository.update(book);
-    }
-
-    @Override
     @ShellMethod(key = {"donate", "d"}, value = "donate book")
-    public void donateBook(@ShellOption String bookName, @ShellOption String author, @ShellOption String genre) {
-        Book book = createBook(bookName, author, genre);
-        long bookId = bookRepository.create(book);
-        authorRepository.create(book.getAuthor(), bookId);
-        genreRepository.create(book.getGenre(), bookId);
+    public long donateBook(@ShellOption String bookName, @ShellOption String author, @ShellOption String genre) {
+        Book book = createBook(bookName, createAuthors(author), createGenres(genre));
+        return bookRepository.create(book);
     }
 
     @Override
+    @Transactional
     @ShellMethod(key = {"take", "t"}, value = "take book")
     public void takeBook(@ShellOption String name, @ShellOption String author, @ShellOption String genre) {
         Book book = bookRepository.findByNameAndAuthorAndGenre(name, author, genre);
         isBookAvailable(book);
         book.setTaken(true);
+        bookRepository.update(book);
+    }
+
+    @Override
+    @Transactional
+    @ShellMethod(key = {"return", "r"}, value = "return book")
+    public void returnBook(long id) {
+        Book book = bookRepository.findById(id);
+        book.setTaken(false);
         bookRepository.update(book);
     }
 
@@ -59,15 +63,27 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @ShellMethod(key = {"showAuthors", "a"}, value = "show authors")
+    public List<Author> showAuthors() {
+        return authorRepository.findAll();
+    }
+
+    @Override
     @ShellMethod(key = {"showByAuthor", "sa"}, value = "show by author")
-    public List<Book> showBooksByAuthor(@ShellOption String author) {
-        return bookRepository.findByAuthor(author);
+    public Book showByAuthors(@ShellOption String author) {
+        return authorRepository.findByName(author).getBook();
+    }
+
+    @Override
+    @ShellMethod(key = {"showGenres", "g"}, value = "show genres")
+    public List<Author> showGenres() {
+        return genreRepository.findAll();
     }
 
     @Override
     @ShellMethod(key = {"showByGenre", "sg"}, value = "show by genre")
-    public List<Book> showBooksByGenre(@ShellOption String genre) {
-        return bookRepository.findByGenre(genre);
+    public Book showByGenres(@ShellOption String author) {
+        return genreRepository.findByName(author).getBook();
     }
 
     @Override
@@ -82,15 +98,27 @@ public class BookServiceImpl implements BookService {
         }
     }
 
-    private Book createBook(String bookName, String author, String genre) {
+    private Book createBook(String bookName, Set<Author> author, Set<Genre> genre) {
         return Book.builder()
                 .name(bookName)
-                .author(Author.builder()
-                        .name(author)
-                        .build())
-                .genre(Genre.builder()
+                .authors(author)
+                .genres(genre)
+                .build();
+    }
+
+    private Set<Genre> createGenres(String... genres) {
+        return Stream.of(genres)
+                .map(genre -> Genre.builder()
                         .name(genre)
                         .build())
-                .build();
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Author> createAuthors(String... authors) {
+        return Stream.of(authors)
+                .map(author -> Author.builder()
+                        .name(author)
+                        .build())
+                .collect(Collectors.toSet());
     }
 }

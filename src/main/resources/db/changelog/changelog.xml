@@ -54,9 +54,6 @@
             <column name="NAME" type="TEXT">
                 <constraints nullable="false"/>
             </column>
-            <column name="BOOK_ID" type="BIGINT">
-                <constraints foreignKeyName="FK_AUTHOR_BOOK" references="BOOKS(BOOK_ID)" deleteCascade="true"/>
-            </column>
         </createTable>
     </changeSet>
 
@@ -88,6 +85,23 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="08092020-1" author="Luchkin">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="AUTHOR_BOOK"/>
+            </not>
+        </preConditions>
+        <createTable tableName="AUTHOR_BOOK">
+            <column name="AUTHOR_ID" type="BIGINT">
+                <constraints foreignKeyName="FK_AUTHOR_BOOK" references="BOOKS(BOOK_ID)" deleteCascade="true"/>
+                <!--                todo check cascade on postgres-->
+            </column>
+            <column name="BOOK_ID" type="BIGINT">
+                <constraints foreignKeyName="FK_BOOK_AUTHOR" references="AUTHORS(AUTHOR_ID)" deleteCascade="true"/>
+                <!--                todo check cascade on postgres-->
+            </column>
+        </createTable>
+    </changeSet>
 
     <changeSet id="05072020-7" author="Luchkin">
         <preConditions onFail="WARN">
@@ -99,10 +113,13 @@
         </insert>
         <insert tableName="AUTHORS">
             <column name="NAME" value="Leo Tolstoy"/>
-            <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='War and peace'"/>
         </insert>
         <insert tableName="GENRES">
             <column name="NAME" value="Historical novel"/>
+            <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='War and peace'"/>
+        </insert>
+        <insert tableName="AUTHOR_BOOK">
+            <column name="AUTHOR_ID" valueComputed="SELECT a.author_id FROM AUTHORS a WHERE a.name ='Leo Tolstoy'"/>
             <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='War and peace'"/>
         </insert>
         <insert tableName="BOOKS">
@@ -111,10 +128,13 @@
         </insert>
         <insert tableName="AUTHORS">
             <column name="NAME" value="Fyodor Dostoevsky"/>
-            <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='Crime and punishment'"/>
         </insert>
         <insert tableName="GENRES">
             <column name="NAME" value="Crime fiction"/>
+            <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='Crime and punishment'"/>
+        </insert>
+        <insert tableName="AUTHOR_BOOK">
+            <column name="AUTHOR_ID" valueComputed="SELECT a.author_id FROM AUTHORS a WHERE a.name ='Fyodor Dostoevsky'"/>
             <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='Crime and punishment'"/>
         </insert>
         <insert tableName="BOOKS">
@@ -123,13 +143,15 @@
         </insert>
         <insert tableName="AUTHORS">
             <column name="NAME" value="author"/>
-            <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='book'"/>
         </insert>
         <insert tableName="GENRES">
             <column name="NAME" value="genre"/>
             <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='book'"/>
         </insert>
+        <insert tableName="AUTHOR_BOOK">
+            <column name="AUTHOR_ID" valueComputed="SELECT a.author_id FROM AUTHORS a WHERE a.name ='author'"/>
+            <column name="BOOK_ID" valueComputed="SELECT b.book_id FROM BOOKS b WHERE b.name ='book'"/>
+        </insert>
     </changeSet>
-
 
 </databaseChangeLog>

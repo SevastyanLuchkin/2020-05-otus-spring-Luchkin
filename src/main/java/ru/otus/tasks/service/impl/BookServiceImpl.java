@@ -1,6 +1,7 @@
 package ru.otus.tasks.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -31,29 +32,31 @@ public class BookServiceImpl implements BookService {
     private final GenreRepository genreRepository;
 
     @Override
-    @ShellMethod(key = {"donate", "d"}, value = "donate book")
+    @ShellMethod(key = {"create", "cr"}, value = "create book")
     public long donateBook(@ShellOption String bookName, @ShellOption String author, @ShellOption String genre) {
         Book book = createBook(bookName, createAuthors(author), createGenres(genre));
-        return bookRepository.create(book);
+        return bookRepository.save(book).getId();
     }
 
     @Override
     @Transactional
     @ShellMethod(key = {"take", "t"}, value = "take book")
-    public void takeBook(@ShellOption String name, @ShellOption String author, @ShellOption String genre) {
-        Book book = bookRepository.findByNameAndAuthorAndGenre(name, author, genre);
-        isBookAvailable(book);
+    public void takeBook(@ShellOption long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Книга не найдена"));
+        if (book == null || book.isTaken()) {
+            throw new RuntimeException("Книги нет в наличии");
+        }
         book.setTaken(true);
-        bookRepository.update(book);
     }
 
     @Override
     @Transactional
     @ShellMethod(key = {"return", "r"}, value = "return book")
     public void returnBook(long id) {
-        Book book = bookRepository.findById(id);
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Книга не найдена"));
         book.setTaken(false);
-        bookRepository.update(book);
     }
 
     @Override
@@ -69,33 +72,47 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @ShellMethod(key = {"showByAuthor", "sa"}, value = "show by author")
-    public Book showByAuthors(@ShellOption String author) {
-        return authorRepository.findByName(author).getBook();
+    public List<Book> showByAuthors(@ShellOption String authorName) {
+        Author author = authorRepository.findByName(authorName)
+                .orElseThrow(() -> new RuntimeException("Автор не найден"));
+        List<Book> books = author.getBooks();
+        books.forEach(this::fetchBookChildrenEntities);
+        return books;
     }
 
     @Override
     @ShellMethod(key = {"showGenres", "g"}, value = "show genres")
-    public List<Author> showGenres() {
+    public List<Genre> showGenres() {
         return genreRepository.findAll();
     }
 
     @Override
     @ShellMethod(key = {"showByGenre", "sg"}, value = "show by genre")
-    public Book showByGenres(@ShellOption String author) {
-        return genreRepository.findByName(author).getBook();
+    public Book showByGenre(@ShellOption String genre) {
+        return genreRepository.findByName(genre)
+                .orElseThrow(() -> new RuntimeException("Жанр не найден"))
+                .getBook();
     }
 
     @Override
+    @Transactional(readOnly = true)
     @ShellMethod(key = {"showAll", "sall"}, value = "show all")
     public List<Book> showAll() {
-        return bookRepository.findAll();
+        List<Book> books = bookRepository.findAll();
+        books.forEach(this::fetchBookChildrenEntities);
+        return books;
     }
 
-    private void isBookAvailable(Book book) {
-        if (book == null || book.isTaken()) {
-            throw new RuntimeException("Книги нет в наличии");
-        }
+    @ShellMethod(key = {"delete", "d"}, value = "delete book")
+    public void delete(long id) {
+        bookRepository.deleteById(id);
+    }
+
+    private void fetchBookChildrenEntities(Book book) {
+        Hibernate.initialize(book.getGenres());
+        Hibernate.initialize(book.getAuthors());
     }
 
     private Book createBook(String bookName, Set<Author> author, Set<Genre> genre) {

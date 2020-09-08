@@ -1,22 +1,15 @@
 package ru.otus.tasks.dao.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import ru.otus.tasks.dao.entity.Book;
 
 import java.util.List;
 
-public interface BookRepository {
+@Repository
+public interface BookRepository extends JpaRepository<Book, Long> {
 
-    long create(Book book);
-
-    Book findById(long id);
-
+    @Query("select b from Book b join fetch b.authors join fetch b.genres where b.name = :name")
     List<Book> findByName(String name);
-
-    Book findByNameAndAuthorAndGenre(String book, String author, String genre);
-
-    List<Book> findAll();
-
-    void update(Book book);
-
-    void delete(long id);
 }

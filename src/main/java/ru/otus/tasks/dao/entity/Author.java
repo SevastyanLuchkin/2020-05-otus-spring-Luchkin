@@ -3,9 +3,12 @@ package ru.otus.tasks.dao.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Data
-@ToString(exclude = "book")
+@Getter
+@Setter
+@ToString(exclude = "books")
 @Entity
 @Builder
 @NoArgsConstructor
@@ -22,7 +25,10 @@ public class Author {
     @Column(name = "NAME")
     private String name;
 
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "BOOK_ID")
-    private Book book;
+    @Builder.Default
+    @ManyToMany
+    @JoinTable(name = "AUTHOR_BOOK",
+            joinColumns = @JoinColumn(name = "AUTHOR_ID"),
+            inverseJoinColumns = @JoinColumn(name = "BOOK_ID"))
+    private List<Book> books = new ArrayList<>();
 }

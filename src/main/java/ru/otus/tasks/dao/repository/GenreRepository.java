@@ -1,13 +1,15 @@
 package ru.otus.tasks.dao.repository;
 
-import ru.otus.tasks.dao.entity.Author;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import ru.otus.tasks.dao.entity.Genre;
 
-import java.util.List;
+import java.util.Optional;
 
-public interface GenreRepository {
+@Repository
+public interface GenreRepository extends JpaRepository<Genre, Long> {
 
-    Genre findByName(String genreName);
-
-    List<Author> findAll();
+    @Query("select g from Genre g join fetch g.book b join fetch b.authors join fetch b.genres where g.name = :genreName")
+    Optional<Genre> findByName(String genreName);
 }

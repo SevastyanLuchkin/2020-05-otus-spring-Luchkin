@@ -1,20 +1,15 @@
 package ru.otus.tasks.dao.entity;
 
 import lombok.*;
-import org.hibernate.annotations.*;
 
 import javax.persistence.*;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import java.util.List;
 import java.util.Set;
 
-@ToString
 @Getter
 @Setter
 @Entity
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "BOOKS")
@@ -29,12 +24,10 @@ public class Book {
     @Column(name = "NAME")
     private String name;
 
-    @OneToMany(mappedBy = "book", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @Fetch(FetchMode.SUBSELECT)
+    @ManyToMany(mappedBy = "books", cascade = CascadeType.ALL)
     private Set<Author> authors;
 
-    @OneToMany(mappedBy = "book", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private Set<Genre> genres;
 
     @Column(name = "TAKEN")

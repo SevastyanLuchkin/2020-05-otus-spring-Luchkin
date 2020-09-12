@@ -1,35 +1,29 @@
 package ru.otus.tasks.dao.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
-@Getter
-@Setter
-@Entity
+@Data
 @Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "BOOKS")
+@Document("book")
 public class Book {
 
     @Id
-    @SequenceGenerator(name = "S_BOOK_GEN", sequenceName = "S_BOOK", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "S_BOOK_GEN")
-    @Column(name = "BOOK_ID")
     private long id;
 
-    @Column(name = "NAME")
     private String name;
 
-    @ManyToMany(mappedBy = "books", cascade = CascadeType.ALL)
-    private Set<Author> authors;
+    private List<String> authors;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
-    private Set<Genre> genres;
+    private List<String> genres;
 
-    @Column(name = "TAKEN")
     private boolean taken;
 }

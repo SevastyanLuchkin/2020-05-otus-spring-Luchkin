@@ -8,13 +8,13 @@ import ru.otus.tasks.dao.entity.Book;
 import java.util.List;
 
 @Repository
-public interface BookRepository extends MongoRepository<Book, Long> {
+public interface BookRepository extends MongoRepository<Book, String> {
 
     List<Book> findByName(String name);
 
-    @Query(value = "{ 'authors' : ?0 }")
-    List<Book> findByAuthorName(String name);
+    @Query(value = "{ 'authors.id' : ?0 }")
+    List<Book> findByAuthorId(String id);
 
-    @Query(value = "{ 'genres' : ?0 }")
-    List<Book> findByGenreName(String name);
+    @Query(value = "{ 'genres.id' : ?0 }")
+    List<Book> findByGenreId(String id);
 }

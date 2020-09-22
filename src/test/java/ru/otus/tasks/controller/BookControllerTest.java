@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import ru.otus.tasks.dao.entity.Author;
 import ru.otus.tasks.dao.entity.Book;
 import ru.otus.tasks.dao.entity.Genre;
-import ru.otus.tasks.dao.repository.BookRepository;
 
 import java.util.Map;
 import java.util.Set;
@@ -28,9 +27,6 @@ class BookControllerTest {
 
     @Autowired
     private TestRestTemplate testRestTemplate;
-
-    @Autowired
-    private BookRepository bookRepository;
 
     @Test
     void create() {

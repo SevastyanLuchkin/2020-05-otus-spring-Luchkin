@@ -1,5 +1,6 @@
 package ru.otus.tasks.dao.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -22,7 +23,8 @@ public class Genre {
     @Column(name = "NAME")
     private String name;
 
-    @ManyToOne(optional = false)
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "BOOK_ID")
     private Book book;
 }

@@ -10,6 +10,7 @@ import ru.otus.tasks.service.BookService;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/book")

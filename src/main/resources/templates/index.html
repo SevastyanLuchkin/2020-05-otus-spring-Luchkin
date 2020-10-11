@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="keywords" th:content="${keywords}"/>
+    <title>List of all books</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .books, .books td {
+            border: 1px solid lightgray;
+            padding: 5px;
+        }
+    </style>
+    <script src="webjars/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+<h1>Books:</h1>
+
+<table class="books">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<form class="bookForm">
+    <label>
+        Имя книги:
+        <input type="text"/>
+    </label>
+    <input type="submit" value="Отправить" name="bookName"/>
+</form>
+<script>
+    $(function () {
+        $.get('/book').done(function (books) {
+            books.forEach(function (book) {
+                $('tbody').append(`
+                    <tr>
+                        <td>${book.id}</td>
+                        <td>${book.name}</td>
+                    </tr>
+                `)
+            });
+        })
+    });
+</script>
+
+<script>
+    $("#bookForm").submit(function (event) {
+        event.preventDefault();
+        const form = $(this);
+        $.ajax("/book/name/book" + form.attr('bookName')).done(function (books) {
+            books.forEach(function (book) {
+                $('tbody').append(`
+                        <tr>
+                            <td>${book.id}</td>
+                            <td>${book.name}</td>
+                        </tr>
+                    `)
+            });
+        });
+    });
+</script>
+</body>
+</html>

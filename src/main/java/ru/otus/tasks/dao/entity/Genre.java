@@ -1,30 +1,20 @@
 package ru.otus.tasks.dao.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-
-import javax.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@ToString(exclude = "book")
-@Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "GENRES")
+@Document("genres")
 public class Genre {
 
     @Id
-    @SequenceGenerator(name = "S_GENRE_GEN", sequenceName = "S_GENRE", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "S_GENRE_GEN")
-    @Column(name = "GENRE_ID")
-    private long id;
+    private String id;
 
-    @Column(name = "NAME")
     private String name;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "BOOK_ID")
     private Book book;
 }

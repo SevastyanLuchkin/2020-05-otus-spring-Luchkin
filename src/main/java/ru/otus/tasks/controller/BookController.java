@@ -29,7 +29,7 @@ public class BookController {
     }
 
     @GetMapping("/{bookId}")
-    public Book findById(@PathVariable Long bookId) {
+    public Book findById(@PathVariable String bookId) {
         return bookService.findById(bookId);
     }
 
@@ -38,23 +38,13 @@ public class BookController {
         return bookService.findByName(bookName);
     }
 
-    @GetMapping("/author/{authorName}")
-    public List<Book> findByAuthor(@PathVariable String authorName) {
-        return bookService.findByAuthor(authorName);
-    }
-
-    @GetMapping("/genre/{genreName}")
-    public Book findByGenre(@PathVariable String genreName) {
-        return bookService.findByGenre(genreName);
-    }
-
     @PutMapping("/{bookId}")
-    public void update(@PathVariable Long bookId, @RequestBody Book book) {
+    public void update(@PathVariable String bookId, @RequestBody Book book) {
         bookService.update(bookId, book);
     }
 
     @DeleteMapping("/{bookId}")
-    public void delete(@PathVariable Long bookId) {
+    public void delete(@PathVariable String bookId) {
         bookService.delete(bookId);
     }
 }

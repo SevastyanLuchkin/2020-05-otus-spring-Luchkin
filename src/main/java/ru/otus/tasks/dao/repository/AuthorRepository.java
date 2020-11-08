@@ -1,15 +1,13 @@
 package ru.otus.tasks.dao.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
 import ru.otus.tasks.dao.entity.Author;
 
-import java.util.Optional;
-
 @Repository
-public interface AuthorRepository extends JpaRepository<Author, Long> {
+public interface AuthorRepository extends ReactiveCrudRepository<Author, String> {
 
-    @Query("select a from Author a join fetch a.books where a.name = :name")
-    Optional<Author> findByName(String name);
+    Mono<Author> findByName(String name);
 }

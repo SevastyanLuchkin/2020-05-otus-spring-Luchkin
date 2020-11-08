@@ -1,12 +1,10 @@
 package ru.otus.tasks.service;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.tasks.dao.entity.Author;
 import ru.otus.tasks.dao.entity.Book;
 import ru.otus.tasks.dao.repository.AuthorRepository;
 import ru.otus.tasks.dao.repository.BookRepository;
@@ -29,15 +27,15 @@ public class BookService {
     }
 
     @Transactional
-    public void update(long id, Book book) {
+    public void update(String id, Book book) {
         Book originBook = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Книга не найдена"));
         originBook.setName(book.getName());
         originBook.setTaken(book.isTaken());
     }
 
-    public Book findById(Long bookId) {
-        return bookRepository.findById(bookId)
+    public Book findById(String id) {
+        return bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Автор не найден"));
     }
 
@@ -46,33 +44,12 @@ public class BookService {
     }
 
     @Transactional(readOnly = true)
-    public List<Book> findByAuthor(String authorName) {
-        Author author = authorRepository.findByName(authorName)
-                .orElseThrow(() -> new RuntimeException("Автор не найден"));
-        List<Book> books = author.getBooks();
-        books.forEach(this::fetchBookChildrenEntities);
-        return books;
-    }
-
-    public Book findByGenre(String genre) {
-        return genreRepository.findByName(genre)
-                .orElseThrow(() -> new RuntimeException("Жанр не найден"))
-                .getBook();
-    }
-
-    @Transactional(readOnly = true)
     public List<Book> findAll(Pageable pageable) {
         Page<Book> books = bookRepository.findAll(pageable);
-        books.forEach(this::fetchBookChildrenEntities);
         return books.getContent();
     }
 
-    public void delete(long id) {
+    public void delete(String id) {
         bookRepository.deleteById(id);
-    }
-
-    private void fetchBookChildrenEntities(Book book) {
-        Hibernate.initialize(book.getGenres());
-        Hibernate.initialize(book.getAuthors());
     }
 }

@@ -1,14 +1,13 @@
 package ru.otus.tasks.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.tasks.dao.entity.Book;
-import ru.otus.tasks.dao.repository.AuthorRepository;
 import ru.otus.tasks.dao.repository.BookRepository;
-import ru.otus.tasks.dao.repository.GenreRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -16,13 +15,9 @@ public class BookService {
 
     private final BookRepository bookRepository;
 
-    private final AuthorRepository authorRepository;
-
-    private final GenreRepository genreRepository;
+    private final ReactiveMongoOperations mongoOperations;
 
     public Mono<Book> create(Book book) {
-//        book.getAuthors().forEach(authorRepository::save);
-//        book.getGenres().forEach(genreRepository::save);
         return bookRepository.save(book);
     }
 
@@ -46,7 +41,6 @@ public class BookService {
         return bookRepository.findByName(name);
     }
 
-    @Transactional(readOnly = true)
     public Flux<Book> findAll() {
         return bookRepository.findAll();
     }

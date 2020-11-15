@@ -1,14 +1,11 @@
 package ru.otus.tasks.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.otus.tasks.dao.entity.Book;
 import ru.otus.tasks.service.BookService;
-
-import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -19,22 +16,22 @@ public class BookController {
     private final BookService bookService;
 
     @PostMapping
-    public ResponseEntity<Book> create(@RequestBody Book book) {
-        return new ResponseEntity<>(bookService.create(book), HttpStatus.CREATED);
+    public Mono<Book> create(@RequestBody Book book) {
+        return bookService.create(book);
     }
 
     @GetMapping
-    public List<Book> findAll(Pageable pageable) {
-        return bookService.findAll(pageable);
+    public Flux<Book> findAll() {
+        return bookService.findAll();
     }
 
     @GetMapping("/{bookId}")
-    public Book findById(@PathVariable String bookId) {
+    public Mono<Book> findById(@PathVariable String bookId) {
         return bookService.findById(bookId);
     }
 
     @GetMapping("/name/{bookName}")
-    public List<Book> findByName(@PathVariable String bookName) {
+    public Flux<Book> findByName(@PathVariable String bookName) {
         return bookService.findByName(bookName);
     }
 

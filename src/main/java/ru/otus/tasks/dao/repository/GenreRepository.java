@@ -8,5 +8,5 @@ import ru.otus.tasks.dao.entity.Genre;
 @Repository
 public interface GenreRepository extends ReactiveMongoRepository<Genre, String> {
 
-    Mono<Genre> findByName(String name);
+    Mono<Genre> findFirstByName(String name);
 }

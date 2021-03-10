@@ -1,15 +1,15 @@
 package ru.otus.tasks;
 
-import org.h2.tools.Console;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
-import java.sql.SQLException;
-
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+@EnableWebSecurity(debug = true)
 @SpringBootApplication
 public class TasksApplication {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
         SpringApplication.run(TasksApplication.class, args);
-        Console.main(args);
     }
 }

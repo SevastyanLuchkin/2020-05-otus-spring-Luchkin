@@ -1,6 +1,5 @@
 package ru.otus.tasks.dao.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -26,7 +25,6 @@ public class Author {
     @Column(name = "NAME")
     private String name;
 
-    @JsonIgnore
     @Builder.Default
     @ManyToMany
     @JoinTable(name = "AUTHOR_BOOK",

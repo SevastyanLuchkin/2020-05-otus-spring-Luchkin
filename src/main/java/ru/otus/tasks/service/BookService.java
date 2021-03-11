@@ -1,78 +1,28 @@
 package ru.otus.tasks.service;
 
-import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.otus.tasks.dao.entity.Author;
 import ru.otus.tasks.dao.entity.Book;
-import ru.otus.tasks.dao.repository.AuthorRepository;
-import ru.otus.tasks.dao.repository.BookRepository;
-import ru.otus.tasks.dao.repository.GenreRepository;
+import ru.otus.tasks.dao.entity.Genre;
 
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class BookService {
+public interface BookService {
 
-    private final BookRepository bookRepository;
+    long donateBook(String name, String author, String genre);
 
-    private final AuthorRepository authorRepository;
+    void takeBook(long id);
 
-    private final GenreRepository genreRepository;
+    void returnBook(long id);
 
-    public Book create(Book book) {
-        return bookRepository.save(book);
-    }
+    List<Book> showBooksByName(String name);
 
-    @Transactional
-    public void update(long id, Book book) {
-        Book originBook = bookRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Книга не найдена"));
-        originBook.setName(book.getName());
-        originBook.setTaken(book.isTaken());
-    }
+    List<Author> showAuthors();
 
-    public Book findById(Long bookId) {
-        return bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Автор не найден"));
-    }
+    List<Book> showByAuthors(String author);
 
-    public List<Book> findByName(String name) {
-        return bookRepository.findByName(name);
-    }
+    List<Genre> showGenres();
 
-    @Transactional(readOnly = true)
-    public List<Book> findByAuthor(String authorName) {
-        Author author = authorRepository.findByName(authorName)
-                .orElseThrow(() -> new RuntimeException("Автор не найден"));
-        List<Book> books = author.getBooks();
-        books.forEach(this::fetchBookChildrenEntities);
-        return books;
-    }
+    Book showByGenre(String author);
 
-    public Book findByGenre(String genre) {
-        return genreRepository.findByName(genre)
-                .orElseThrow(() -> new RuntimeException("Жанр не найден"))
-                .getBook();
-    }
-
-    @Transactional(readOnly = true)
-    public List<Book> findAll(Pageable pageable) {
-        Page<Book> books = bookRepository.findAll(pageable);
-        books.forEach(this::fetchBookChildrenEntities);
-        return books.getContent();
-    }
-
-    public void delete(long id) {
-        bookRepository.deleteById(id);
-    }
-
-    private void fetchBookChildrenEntities(Book book) {
-        Hibernate.initialize(book.getGenres());
-        Hibernate.initialize(book.getAuthors());
-    }
+    List<Book> showAll();
 }
